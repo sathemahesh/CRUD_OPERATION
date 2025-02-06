@@ -7,61 +7,61 @@ export const Posts = () => {
     const [newPost, setNewPost] = useState({ title: "", body: "" });
     const [editPostId, setEditPostId] = useState(null);
 
-    // Fetch posts from API or localStorage
+    
     const getPostData = async () => {
         try {
             const savedPosts = localStorage.getItem("posts");
             if (savedPosts) {
-                setData(JSON.parse(savedPosts)); // Load posts from localStorage
+                setData(JSON.parse(savedPosts)); 
             } else {
                 const res = await getPost();
                 setData(res.data);
-                localStorage.setItem("posts", JSON.stringify(res.data)); // Save initial data to localStorage
+                localStorage.setItem("posts", JSON.stringify(res.data));
             }
         } catch (error) {
             console.error("Error fetching posts:", error);
         }
     };
 
-    // Save data to localStorage whenever data changes
+    
     const saveToLocalStorage = (newData) => {
         localStorage.setItem("posts", JSON.stringify(newData));
     };
 
-    // Handle creating a new post
+   
     const handleCreate = async () => {
         try {
             if (newPost.title && newPost.body) {
-                const newPostData = { id: Date.now(), ...newPost }; // Simulate new ID
+                const newPostData = { id: Date.now(), ...newPost }; 
                 const updatedData = [...data, newPostData];
                 setData(updatedData);
-                saveToLocalStorage(updatedData); // Save the updated data to localStorage
-                setNewPost({ title: "", body: "" }); // Reset form
+                saveToLocalStorage(updatedData); 
+                setNewPost({ title: "", body: "" }); 
             }
         } catch (error) {
             console.error("Error creating post:", error);
         }
     };
 
-    // Handle deleting a post
+
     const handleDelete = async (id) => {
         try {
             const updatedData = data.filter(post => post.id !== id);
             setData(updatedData);
-            saveToLocalStorage(updatedData); // Save the updated data to localStorage
+            saveToLocalStorage(updatedData); 
         } catch (error) {
             console.error("Error deleting post:", error);
         }
     };
 
-    // Handle editing a post
+    
     const handleEdit = (id) => {
         const postToEdit = data.find(post => post.id === id);
         setEditPostId(id);
-        setNewPost({ title: postToEdit.title, body: postToEdit.body }); // Pre-fill form with post data
+        setNewPost({ title: postToEdit.title, body: postToEdit.body }); 
     };
 
-    // Handle updating an edited post
+  
     const handleUpdate = async () => {
         if (editPostId) {
             try {
@@ -77,7 +77,6 @@ export const Posts = () => {
         }
     };
 
-    // Fetch data on component mount
     useEffect(() => {
         getPostData();
     }, []);
