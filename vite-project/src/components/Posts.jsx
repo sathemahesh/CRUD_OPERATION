@@ -1,18 +1,17 @@
 import { useEffect, useState } from "react";
-import { getPost, createPost, deletePost, updatePost } from "../api/PostApi";
-import '../App.css';
+import { getPost } from "../api/PostApi";
+import "../App.css";
 
 export const Posts = () => {
     const [data, setData] = useState([]);
     const [newPost, setNewPost] = useState({ title: "", body: "" });
     const [editPostId, setEditPostId] = useState(null);
 
-    
     const getPostData = async () => {
         try {
             const savedPosts = localStorage.getItem("posts");
             if (savedPosts) {
-                setData(JSON.parse(savedPosts)); 
+                setData(JSON.parse(savedPosts));
             } else {
                 const res = await getPost();
                 setData(res.data);
@@ -23,57 +22,42 @@ export const Posts = () => {
         }
     };
 
-    
     const saveToLocalStorage = (newData) => {
         localStorage.setItem("posts", JSON.stringify(newData));
     };
 
-   
-    const handleCreate = async () => {
-        try {
-            if (newPost.title && newPost.body) {
-                const newPostData = { id: Date.now(), ...newPost }; 
-                const updatedData = [...data, newPostData];
-                setData(updatedData);
-                saveToLocalStorage(updatedData); 
-                setNewPost({ title: "", body: "" }); 
-            }
-        } catch (error) {
-            console.error("Error creating post:", error);
-        }
-    };
-
-
-    const handleDelete = async (id) => {
-        try {
-            const updatedData = data.filter(post => post.id !== id);
+    const handleCreate = () => {
+        if (newPost.title && newPost.body) {
+            const newPostData = { id: Date.now(), ...newPost };
+            const updatedData = [newPostData, ...data];
             setData(updatedData);
-            saveToLocalStorage(updatedData); 
-        } catch (error) {
-            console.error("Error deleting post:", error);
+            saveToLocalStorage(updatedData);
+            setNewPost({ title: "", body: "" });
         }
     };
 
-    
-    const handleEdit = (id) => {
-        const postToEdit = data.find(post => post.id === id);
-        setEditPostId(id);
-        setNewPost({ title: postToEdit.title, body: postToEdit.body }); 
+    const handleDelete = (id) => {
+        const updatedData = data.filter((post) => post.id !== id);
+        setData(updatedData);
+        saveToLocalStorage(updatedData);
     };
 
-  
-    const handleUpdate = async () => {
+    const handleEdit = (id) => {
+        const postToEdit = data.find((post) => post.id === id);
+        setEditPostId(id);
+        setNewPost({ title: postToEdit.title, body: postToEdit.body });
+    };
+
+    const handleUpdate = () => {
         if (editPostId) {
-            try {
-                const updatedPost = { title: newPost.title, body: newPost.body };
-                const updatedData = data.map(post => (post.id === editPostId ? { ...post, ...updatedPost } : post));
-                setData(updatedData);
-                saveToLocalStorage(updatedData); // Save the updated data to localStorage
-                setEditPostId(null);
-                setNewPost({ title: "", body: "" }); // Reset form after update
-            } catch (error) {
-                console.error("Error updating post:", error);
-            }
+            const updatedPost = { title: newPost.title, body: newPost.body };
+            const updatedData = data.map((post) =>
+                post.id === editPostId ? { ...post, ...updatedPost } : post
+            );
+            setData(updatedData);
+            saveToLocalStorage(updatedData);
+            setEditPostId(null);
+            setNewPost({ title: "", body: "" });
         }
     };
 
@@ -101,14 +85,14 @@ export const Posts = () => {
                 </button>
             </div>
 
-            {/* List of Posts */}
-            <ul>
+            {/* Responsive Card Layout */}
+            <ul className="post-container">
                 {data.map((curElem, index) => {
                     const { id, body, title } = curElem;
                     return (
-                        <li key={id}>
+                        <li key={id} className="post-card">
                             <p className="post-number">#{index + 1}</p>
-                            <p><strong>{title}</strong></p>
+                            <h3>{title}</h3>
                             <p>{body}</p>
                             <div className="actions">
                                 <button onClick={() => handleEdit(id)}>Edit</button>
